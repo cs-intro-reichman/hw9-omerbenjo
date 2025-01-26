@@ -117,15 +117,24 @@ public class MemorySpace {
      */
     public void defrag() {
         Node currentNode = freeList.getFirst();
-        while (currentNode != null && currentNode.next != null) {
-            Node nextNode = currentNode.next;
-            if (currentNode.block.baseAddress + currentNode.block.length == nextNode.block.baseAddress) {
-                currentNode.block.length += nextNode.block.length;
-                freeList.remove(nextNode.block);
-            } else {
+        boolean flag = true;
+        while (currentNode != null) {
+            Node runner = freeList.getFirst();
+            while (runner != null) {
+                if (currentNode.block.baseAddress + currentNode.block.length == runner.block.baseAddress) {
+                    currentNode.block.length += runner.block.length;
+                    Node newRemove = runner;
+                    runner = runner.next;
+                    freeList.remove(newRemove.block);
+                    flag = false;
+                } else {
+                    runner = runner.next;
+                }
+            }
+            if (flag) {
                 currentNode = currentNode.next;
             }
+            flag = true;
         }
-
     }
 }
